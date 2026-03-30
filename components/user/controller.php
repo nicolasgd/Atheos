@@ -20,118 +20,119 @@ $password = POST("password");
 $language = POST("language");
 
 switch ($action) {
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
 	// Authenticate / LogIn
 	//////////////////////////////////////////////////////////////////////////80
 	case "authenticate":
-		if ($username && $password) {
-			$languages = $i18n->codes();
-			if (!$language || !isset($languages[$language])) $language = "en";
+			if ($username && $password) {
+							$languages = $i18n->codes();
+							if (!$language || !isset($languages[$language])) $language = "en";
 
-			// theme
-			$User->authenticate($username, $password, $language);
-		} elseif (!$username) {
-			Common::send(417, "Missing username.");
-		} else {
-			Common::send(417, "Missing password.");
-		}
-		break;
+				// theme
+				$User->authenticate($username, $password, $language);
+			} elseif (!$username) {
+							Common::send(417, "Missing username.");
+			} else {
+							Common::send(417, "Missing password.");
+			}
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Change Password
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Change Password
+		//////////////////////////////////////////////////////////////////////////80
 	case "changePassword":
-		if (!$username || !$password) {
-			Common::send(417, "Missing username or password.");
-		}
+			if (!$username || !$password) {
+							Common::send(417, "Missing username or password.");
+			}
 
-		if ($username === "s3lf") {
-			$username = SESSION("user");
-			$User->changePassword($username, $password);
-		} elseif (Common::checkAccess("configure")) {
-			$User->changePassword($username, $password);
-		} else {
-			Common::send(403, "User does not have access.");
-		}
-		break;
+			if ($username === "s3lf") {
+							$username = SESSION("user");
+							$User->changePassword($username, $password);
+			} elseif (Common::checkAccess("configure")) {
+							$User->changePassword($username, $password);
+			} else {
+							Common::send(403, "User does not have access.");
+			}
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Create User
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Create User
+		//////////////////////////////////////////////////////////////////////////80
 	case "create":
-		if (!Common::checkAccess("configure")) {
-			Common::send("warning", "User does not have access.");
-		}
-		if (!$username || !$password) {
-			Common::send(417, "Missing username or password.");
-		}
+			if (!Common::checkAccess("configure")) {
+							Common::send("warning", "User does not have access.");
+			}
+			if (!$username || !$password) {
+							Common::send(417, "Missing username or password.");
+			}
 
-		$User->create($username, $password);
+			$User->create($username, $password);
 
-		break;
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Delete User
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Delete User
+		//////////////////////////////////////////////////////////////////////////80
 	case "delete":
-		if (!Common::checkAccess("configure")) {
-			Common::send("warning", "User does not have access.");
-		}
-		if (!$username) {
-			Common::send(417, "Missing username.");
-		}
-		$User->delete($username);
+			if (!Common::checkAccess("configure")) {
+							Common::send("warning", "User does not have access.");
+			}
+			if (!$username) {
+							Common::send(417, "Missing username.");
+			}
+			$User->delete($username);
 
-		break;
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Verify Session
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Verify Session
+		//////////////////////////////////////////////////////////////////////////80
 	case "keepAlive":
-		$User->verify($activeUser);
-		break;
+			$User->verify($activeUser);
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Logout
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Logout
+		//////////////////////////////////////////////////////////////////////////80
 	case "logout":
-		session_unset();
-		session_destroy();
-		session_start();
-		break;
+			session_unset();
+			session_destroy();
+			session_start();
+			Common::send(204);
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Save Active Project
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Save Active Project
+		//////////////////////////////////////////////////////////////////////////80
 	case "saveActiveProject":
-		$activeName = POST("name");
-		$activePath = POST("path");
+			$activeName = POST("name");
+			$activePath = POST("path");
 
-		if (!$activeName || !$activePath) {
-			Common::send(417, "Missing name or path.");
-		}
-		$User->saveActiveProject($activeName, $activePath);
-		break;
+			if (!$activeName || !$activePath) {
+							Common::send(417, "Missing name or path.");
+			}
+			$User->saveActiveProject($activeName, $activePath);
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Set Project Access
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Set Project Access
+		//////////////////////////////////////////////////////////////////////////80
 	case "updateACL":
-		if (!Common::checkAccess("configure")) {
-			Common::send(403, "User does not have access.");
-		} elseif (!$username) {
-			Common::send(417, "Missing username.");
-		}
+			if (!Common::checkAccess("configure")) {
+							Common::send(403, "User does not have access.");
+			} elseif (!$username) {
+							Common::send(417, "Missing username.");
+			}
 
-		$userACL = POST("userACL");
-		$User->updateACL($username, $userACL);
+			$userACL = POST("userACL");
+			$User->updateACL($username, $userACL);
 
-		break;
+			break;
 
-	//////////////////////////////////////////////////////////////////////////80
-	// Default: Invalid Action
-	//////////////////////////////////////////////////////////////////////////80
+		//////////////////////////////////////////////////////////////////////////80
+		// Default: Invalid Action
+		//////////////////////////////////////////////////////////////////////////80
 	default:
-		Common::send(416, "Invalid action.");
-		break;
+			Common::send(416, "invalid_action");
+			break;
 }
